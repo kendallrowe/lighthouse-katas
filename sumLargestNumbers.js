@@ -5,7 +5,7 @@ const sumLargestNumbers = function(data) {
     return "Please make sure to pass 2 or more numbers in your array";
   } else  {
     // Iterate through all values in the passed array and apply the check number pair function if value is a number
-    data.forEach(function(value, index, arr) {
+    data.forEach(function(value) {
       if (typeof(value) === "number") {
         checkNumberPair(largeNumberPair, value);
       } else {
