@@ -2,25 +2,34 @@ const urlDecode = function(text) {
   let propertyKey = [];
   let propertyValue = [];
   let decodedObject = new Object();
-  let equalsFound = true;
+  let moreToSearch = true;
   let indexOfEquals = -1;
+  let indexOfAnd = -1;
   let remainingSearchSubstring = text;
+  let currentIndex = 0;
 
-  while (equalsFound === true) {
+  while (moreToSearch === true) {
     indexOfEquals = remainingSearchSubstring.search("=");
-    if (indexOfEquals > 0) {  
-      propertyKey.push(remainingSearchSubstring.substring(0, (indexOfEquals)));
-      remainingSearchSubstring = remainingSearchSubstring.substring(indexOfEquals + 1);
-    } else {
-       equalsFound = false;
+    indexOfAnd = remainingSearchSubstring.search("&");
+
+    if (indexOfEquals > -1 && (indexOfEquals < indexOfAnd || indexOfAnd === -1)) {
+      propertyKey.push(scrapeSpaces(remainingSearchSubstring.substring(currentIndex,indexOfEquals)))
     }
   }
 
-  console.log(propertyKey);
 };
 
+const scrapeSpaces = function(searchString) {
+  let spaceIndex = searchString.search("%20");  
+  let currentIndex = 0;
 
+  while (spaceIndex > -1) {
+    searchString = searchString.substring(currentIndex, spaceIndex) + " " + searchString.substring(spaceIndex + 3);
+    spaceIndex = searchString.search("%20");
+  }
 
+  return searchString;
+}
 
 console.log(urlDecode("duck=rubber"));
 console.log(urlDecode("bootcamp=Lighthouse%20Labs"));
