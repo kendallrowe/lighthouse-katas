@@ -2,36 +2,32 @@ const urlDecode = function(text) {
   let propertyKey = [];
   let propertyValue = [];
   let decodedObject = new Object();
-  let moreToSearch = true;
-  let indexOfEquals = -1;
-  let indexOfAnd = -1;
-  let remainingSearchSubstring = text;
-  let currentIndex = 0;
+  let currentSubstringPrint = "";
 
-  while (moreToSearch === true) {
-    indexOfEquals = remainingSearchSubstring.search("=");
-    indexOfAnd = remainingSearchSubstring.search("&");
-
-    if (indexOfEquals > -1 && (indexOfEquals < indexOfAnd || indexOfAnd === -1)) {
-      propertyKey.push(scrapeSpaces(remainingSearchSubstring.substring(currentIndex,indexOfEquals)))
+  for (let i = 0; i < text.length; i++) {
+    if (text.substring(i).search("%20") === 0) {
+      i += 2;
+      currentSubstringPrint += " ";
+    } else if (text.charAt(i) === "=") {
+      propertyKey.push(currentSubstringPrint);
+      currentSubstringPrint = "";
+    } else if (text.charAt(i) === "&") {
+      propertyValue.push(currentSubstringPrint);
+      currentSubstringPrint = "";
+    } else {
+      currentSubstringPrint += text.charAt(i);
     }
   }
+  propertyValue.push(currentSubstringPrint);
 
+  propertyKey.forEach(function(currentKey, index){
+    decodedObject[currentKey] = propertyValue[index];
+  });
+
+  return decodedObject
 };
-
-const scrapeSpaces = function(searchString) {
-  let spaceIndex = searchString.search("%20");  
-  let currentIndex = 0;
-
-  while (spaceIndex > -1) {
-    searchString = searchString.substring(currentIndex, spaceIndex) + " " + searchString.substring(spaceIndex + 3);
-    spaceIndex = searchString.search("%20");
-  }
-
-  return searchString;
-}
 
 console.log(urlDecode("duck=rubber"));
 console.log(urlDecode("bootcamp=Lighthouse%20Labs"));
 console.log(urlDecode("city=Vancouver&weather=lots%20of%20rain"));
-// console.log(urlDecode("city=Vancouver&weather=lots%20of%20rain").weather);
+console.log(urlDecode("city=Vancouver&weather=lots%20of%20rain").weather);
