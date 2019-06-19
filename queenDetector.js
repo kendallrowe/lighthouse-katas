@@ -32,6 +32,8 @@ const queenThreat = function(chessBoard) {
   let queen1 = new Array(2);
   let queen1Found = false;
   let queen2 = new Array(2);
+  let diagonalDirections = ["aboveLeft", "aboveRight", "belowLeft", "belowRight"];
+
   // Iterate through board to find location of queens
   // Iterate through each row of array
   for (let row = 0; row < 8; row++) {
@@ -50,67 +52,46 @@ const queenThreat = function(chessBoard) {
   if (queen1[0] === queen2[0] || queen1[1] === queen2[1]){
     return true;
   }
-  // Iterate through diagonal using queen one as starting point to check for threats
-  return checkDiagonals(chessBoard, queen1);
+  // Iterate through diagonals using queen one as starting point to check for threats
+  for (let i = 0; i < 4; i++) {
+    if (checkDiagonals(chessBoard, queen1, diagonalDirections[i]) === true) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
-const checkDiagonals = function(chessBoard, queen1) {
+// Object holding methods to determine logical check of whether current square is on the chessboard when checking each diagonal
+const rowInBoundsCheck = {
+  aboveLeft: function(currentRow, currentCol) { return currentRow >= 0 && currentCol >= 0 },
+  aboveRight: function(currentRow, currentCol) { return currentRow >= 0 && currentCol <= 7 },
+  belowLeft: function(currentRow, currentCol) { return currentRow <= 7 && currentCol >= 0 },
+  belowRight: function(currentRow, currentCol) { return currentRow <= 7 && currentCol <= 7 }
+}
+
+const checkDiagonals = function(chessBoard, queen1, diagonalDirection) {
   let currentRow = queen1[0];
   let currentCol = queen1[1];
 
   // Iterate through all squares above and to left of our starting queen position
-  while (currentRow >= 0 && currentCol >= 0) {
+  while (rowInBoundsCheck[diagonalDirection](currentRow, currentCol)) {
     if (currentRow !== queen1[0] && currentCol !== queen1[1]) {
       if(chessBoard[currentRow][currentCol] === 1) {
         return true;
       }
     }
-    currentRow--;
-    currentCol--;
-  }
-  currentRow = queen1[0];
-  currentCol = queen1[1];
-  
-  // Iterate through all squares above and to right of our starting queen position
-  while (currentRow >= 0 && currentCol <= 7) {
-    if (currentRow !== queen1[0] && currentCol !== queen1[1]) {
-      if(chessBoard[currentRow][currentCol] === 1) {
-        return true;
-      }
-    }
-    currentRow--;
-    currentCol++;
-  }
-  currentRow = queen1[0];
-  currentCol = queen1[1];
-
-  // Iterate through all squares below and to left of our starting queen position
-  while (currentRow <= 7 && currentCol >= 0) {
-    if (currentRow !== queen1[0] && currentCol !== queen1[1]) {
-      if(chessBoard[currentRow][currentCol] === 1) {
-        return true;
-      }
-    }
-    currentRow++;
-    currentCol--;
-  }
-  currentRow = queen1[0];
-  currentCol = queen1[1];
-
-  // Iterate through all squares below and to right of our starting queen position
-  while (currentRow <= 7 && currentCol <= 7) {
-    if (currentRow !== queen1[0] && currentCol !== queen1[1]) {
-      if(chessBoard[currentRow][currentCol] === 1) {
-        return true;
-      }
-    }
-    currentRow++;
-    currentCol++;
+    currentRow = (diagonalDirection === "belowLeft" || diagonalDirection === "belowRight") ? currentRow + 1 : currentRow - 1;
+    currentCol = (diagonalDirection === "aboveRight" || diagonalDirection === "belowRight") ? currentCol + 1 : currentCol - 1;
   }
 
   return false;
 }
 
 let generatedBoard = generateBoard([0, 5], [5, 0]);
+console.log(generatedBoard);
+console.log(queenThreat(generatedBoard));
+
+generatedBoard = generateBoard([0, 0], [5, 7]);
 console.log(generatedBoard);
 console.log(queenThreat(generatedBoard));
